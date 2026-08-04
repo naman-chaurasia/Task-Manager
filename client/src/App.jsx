@@ -1,17 +1,27 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { PrivateRoute, PublicRoute } from "./components/PrivateRoute.jsx";
+import LandingPage from "./pages/landing-page.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Dashboard from "./pages/dashboard.jsx";
+import AboutPage from "./pages/about-page.jsx";
+import PrivacyPage from "./pages/privacy-page.jsx";
+import TermsPage from "./pages/terms-page.jsx";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Routes (redirect to /dashboard if logged in) */}
+          {/* Public Landing Page */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+
+          {/* Auth Routes (redirect to /dashboard if logged in) */}
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -23,9 +33,8 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
 
-          {/* Fallback route */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Fallback route to home */}
+          <Route path="*" element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

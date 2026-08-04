@@ -1,59 +1,45 @@
-import { Button } from "@/components/ui/button";
+import React from "react";
+import Navbar from "../components/layout/navbar.jsx";
+import Footer from "../components/layout/footer.jsx";
 
 export default function TermsPage() {
-  const navigate = (path) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center py-6 sm:py-10">
-      <section className="container mx-auto px-2 sm:px-4">
-        <div className="w-full max-w-2xl mx-auto bg-gray-900 rounded-2xl shadow-xl border border-gray-800 p-4 sm:p-8 md:p-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-center">
-            Terms <span className="text-blue-400">of Service</span>
+    <div className="min-h-screen flex flex-col bg-[#F8F6FE] text-[#1E1B4B]">
+      <Navbar />
+
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16">
+        <div className="bg-white rounded-3xl p-8 md:p-12 border border-[#E8E5F7] shadow-[0_10px_35px_rgba(124,92,255,0.06)]">
+          <h1 
+            className="text-3xl sm:text-4xl font-extrabold text-[#1E1B4B] mb-6"
+            style={{ fontFamily: "'Fraunces', serif" }}
+          >
+            Terms of Service
           </h1>
-          <p className="text-base sm:text-lg text-gray-300 mb-6 sm:mb-8 text-center">
-            By using TaskFlow, you agree to the following terms. Please read them carefully.
-          </p>
-          <div className="divide-y divide-gray-800">
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Use of Service</h2>
-              <p className="text-gray-300 text-sm sm:text-base">TaskFlow is provided for personal and professional task management. You agree not to misuse the service or attempt to disrupt its operation.</p>
-            </div>
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Account Responsibility</h2>
-              <p className="text-gray-300 text-sm sm:text-base">You are responsible for maintaining the confidentiality of your account and password. You agree to notify us of any unauthorized use.</p>
-            </div>
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Content Ownership</h2>
-              <p className="text-gray-300 text-sm sm:text-base">You retain ownership of your tasks and data. TaskFlow does not claim any rights over your content.</p>
-            </div>
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Limitation of Liability</h2>
-              <p className="text-gray-300 text-sm sm:text-base">TaskFlow is provided "as is" without warranties. We are not liable for any damages resulting from the use of the service.</p>
-            </div>
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Changes to Terms</h2>
-              <p className="text-gray-300 text-sm sm:text-base">We may update these terms from time to time. Continued use of TaskFlow means you accept any changes.</p>
-            </div>
-            <div className="py-4 sm:py-6">
-              <h2 className="font-bold text-white mb-2 text-base sm:text-lg">Contact</h2>
-              <p className="text-gray-300 text-sm sm:text-base">If you have any questions about these terms, contact us at <a href="mailto:naman.chaurasia0311@gmail.com" className="text-blue-400 underline">naman.chaurasia0311@gmail.com</a>.</p>
-            </div>
-          </div>
-          <div className="flex justify-center mt-8 sm:mt-10">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="border-gray-700 text-gray-300 hover:bg-gray-800 font-semibold px-6 sm:px-8 py-2 sm:py-3 rounded-xl shadow w-full sm:w-auto"
-              onClick={() => navigate('/')}
-            >
-              Back to Home
-            </Button>
+
+          <div className="space-y-6 text-sm text-[#6B6396] leading-relaxed">
+            <p>
+              Welcome to TaskFlow. By accessing or using our application, you agree to comply with and be bound by these terms.
+            </p>
+
+            <h3 className="text-base font-bold text-[#1E1B4B]">1. 100% Free Forever Service</h3>
+            <p>
+              TaskFlow is provided completely free of charge. There are no premium subscriptions, paywalls, or hidden costs.
+            </p>
+
+            <h3 className="text-base font-bold text-[#1E1B4B]">2. Account Responsibilities</h3>
+            <p>
+              You are responsible for maintaining the confidentiality of your login credentials.
+            </p>
+
+            <h3 className="text-base font-bold text-[#1E1B4B]">3. Contact</h3>
+            <p>
+              For inquiries regarding service terms, please contact <a href="mailto:naman.chaurasia0311@gmail.com" className="text-[#7C5CFF] font-semibold hover:underline">naman.chaurasia0311@gmail.com</a>.
+            </p>
           </div>
         </div>
-      </section>
+      </main>
+
+      <Footer />
     </div>
   );
 }
