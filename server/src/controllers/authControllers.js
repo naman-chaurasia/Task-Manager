@@ -10,10 +10,10 @@ export const generateToken = (userId) => {
 
 // Helper to set httpOnly cookie
 const setTokenCookie = (res, token) => {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER;
     const cookieOptions = {
         httpOnly: true,
-        secure: isProduction,
+        secure: isProduction ? true : false,
         sameSite: isProduction ? 'none' : 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     };
