@@ -4,7 +4,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import { PrivateRoute, PublicRoute } from "./components/PrivateRoute.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
+import Dashboard from "./pages/dashboard.jsx";
 
 function App() {
   return (
