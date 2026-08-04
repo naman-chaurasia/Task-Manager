@@ -2,19 +2,17 @@
 
 @layer base {
   :root {
-    --background: #FAF7F2;
-    --foreground: #1C1B1A;
+    --background: #F8F6FE;
+    --foreground: #1E1B4B;
     --card: #FFFFFF;
-    --card-foreground: #1C1B1A;
-    --primary: #2D3B36;
+    --card-foreground: #1E1B4B;
+    --primary: #7C5CFF;
     --primary-foreground: #FFFFFF;
-    --accent: #E8603C;
-    --accent-foreground: #FFFFFF;
-    --success: #7A9B76;
-    --success-foreground: #FFFFFF;
-    --muted: #6B6560;
-    --border: #E5DFD6;
-    --radius: 0.75rem;
+    --secondary: #F3F0FC;
+    --secondary-foreground: #1E1B4B;
+    --muted: #6B6396;
+    --border: #E8E5F7;
+    --radius: 1rem;
   }
 
   body {
@@ -30,28 +28,38 @@
   }
 }
 
-/* Custom Utilities for Editorial Aesthetics */
-.shadow-soft {
-  box-shadow: 0px 8px 24px rgba(45, 59, 54, 0.04);
+/* Custom Soft Lavender Shadows & Utilities */
+.shadow-lavender {
+  box-shadow: 0px 10px 30px rgba(124, 92, 255, 0.08);
 }
 
-.shadow-elevated {
-  box-shadow: 0px 16px 48px rgba(45, 59, 54, 0.08);
+.shadow-lavender-lg {
+  box-shadow: 0px 20px 40px rgba(124, 92, 255, 0.12);
 }
 
-.input-minimal {
-  border: none;
-  border-bottom: 1px solid #2D3B36;
-  border-radius: 0;
-  background-color: transparent;
-  padding-left: 0;
-  padding-right: 0;
-  transition: border-color 0.2s ease;
+.glass-lavender {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.input-minimal:focus {
-  outline: none;
-  border-bottom-color: #E8603C;
+/* Animated Gradient Background */
+@keyframes lavenderMesh {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.bg-animated-mesh {
+  background: linear-gradient(-45deg, #FAF8FF, #F3F0FC, #E8E5F7, #FAF8FF);
+  background-size: 400% 400%;
+  animation: lavenderMesh 15s ease infinite;
 }
 
 .material-symbols-outlined {

@@ -1,82 +1,95 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Heart, Star } from "lucide-react";
-import image from "@/assets/image.png";
-import { MacbookScroll } from "@/components/landing/macbook-scroll";
-import { CheckSquare } from "lucide-react";
+import React from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
+
 export function HeroSection() {
-  // Simple navigation function
-  const navigate = (path) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
   return (
-    <section className="container z-1 relative bg-black">
-      <div className="mx-auto flex max-w-[980px] flex-col items-center gap-2 py-6 sm:py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20 px-2 sm:px-0">
+    <section className="relative overflow-hidden pt-28 pb-16 md:pt-36 md:pb-24 bg-animated-mesh">
+      {/* Soft Ambient Lavender Orbs */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#7C5CFF]/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         {/* Badge */}
-        <Badge variant="outline" className="mb-4 bg-blue-600 border-blue-600 text-white text-xs sm:text-sm px-3 py-1">
-          <Star className="mr-1 h-3 w-3" />
-          Completely Free Forever
-        </Badge>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 bg-[#F3F0FC] border border-[#E8E5F7] text-[#7C5CFF] text-xs sm:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 shadow-sm"
+        >
+          <Sparkles size={14} />
+          <span>Completely Free Forever</span>
+        </motion.div>
 
-        {/* Heading */}
-        <h1 className="text-center text-2xl sm:text-3xl md:text-6xl font-bold leading-tight tracking-tighter lg:leading-[1.1] text-white">
-          Organize your tasks.{" "}
-          <span className="text-blue-400">Boost productivity.</span>
-        </h1>
-
-        {/* Subheading */}
-        <p className="max-w-[750px] text-center text-base sm:text-lg text-gray-400 sm:text-xl px-1">
-          TaskFlow helps you manage your daily tasks, set priorities, and achieve your goals 
-          with a beautiful and intuitive interface. No hidden costs, no limitations.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row w-full items-center justify-center gap-3 sm:space-x-4 py-4 md:pb-10">
-          <Button size="lg" className="h-11 bg-blue-600 hover:bg-blue-700 text-white" onClick={() => navigate('/signup')}>
-            Get Started Free
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="lg" className="h-11 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white" onClick={() => navigate('/about')}>
-            <Heart className="mr-2 h-4 w-4" />
-            Learn More
-          </Button>
-        </div>
-
-        {/* Stats */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-xs sm:text-sm text-gray-400 mt-2">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-white">10K+</span>
-            <span>Active Users</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-white">1M+</span>
-            <span>Tasks Completed</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-white">100%</span>
-            <span>Free Forever</span>
-          </div>
-        </div>
-      </div>
-      {/* Macbook Scroll Section */}
-      <div className="w-full rounded-lg overflow-hidden bg-white dark:bg-[#0B0B0F] mt-6 sm:mt-10">
-      <MacbookScroll
-        title={
-          <span>
-            TaskFlow: Modern Task Management for Everyone.<br />
-            Built with ❤️ using Tailwind CSS.
+        {/* Hero Heading */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="text-4xl sm:text-5xl md:text-7xl font-extrabold text-[#1E1B4B] tracking-tight leading-[1.15] mb-6"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          Organize your tasks. <br className="hidden sm:inline" />
+          <span className="text-[#7C5CFF] bg-clip-text text-transparent bg-gradient-to-r from-[#7C5CFF] to-[#6366F1]">
+            Boost productivity.
           </span>
-        }
-        badge={
-          <div className="h-10 w-10 -rotate-12 transform flex items-center justify-center bg-blue-600 rounded-full shadow-lg border-4 border-white">
-             <CheckSquare className="text-blue-500 mr-3 transition-all duration-300 group-hover:text-blue-400 w-7 h-7" size={28} />
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="max-w-2xl mx-auto text-base sm:text-lg md:text-xl text-[#6B6396] leading-relaxed mb-8"
+        >
+          TaskFlow helps you manage your daily tasks, set priorities, and achieve your goals with a calm, beautiful lavender interface. No hidden costs, no limitations.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+        >
+          <Link
+            to="/register"
+            className="w-full sm:w-auto bg-[#7C5CFF] hover:bg-[#6366F1] text-white font-semibold py-4 px-8 rounded-2xl shadow-[0_8px_25px_rgba(124,92,255,0.35)] transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 text-base"
+          >
+            <span>Get Started Free</span>
+            <ArrowRight size={18} />
+          </Link>
+
+          <Link
+            to="/about"
+            className="w-full sm:w-auto bg-white border border-[#E8E5F7] hover:border-[#7C5CFF] text-[#1E1B4B] font-semibold py-4 px-8 rounded-2xl shadow-sm hover:shadow-[0_4px_20px_rgba(124,92,255,0.08)] transition-all flex items-center justify-center gap-2 text-base"
+          >
+            <span>Learn More</span>
+          </Link>
+        </motion.div>
+
+        {/* Metrics Grid */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-6 border-t border-[#E8E5F7]"
+        >
+          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-[#E8E5F7] shadow-[0_4px_15px_rgba(124,92,255,0.04)] text-center">
+            <div className="text-2xl font-bold text-[#1E1B4B]">10K+</div>
+            <div className="text-xs text-[#6B6396] font-medium mt-0.5">Active Focusers</div>
           </div>
-        }
-        src={image}
-        showGradient={false}
-      />
+
+          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-[#E8E5F7] shadow-[0_4px_15px_rgba(124,92,255,0.04)] text-center">
+            <div className="text-2xl font-bold text-[#7C5CFF]">1M+</div>
+            <div className="text-xs text-[#6B6396] font-medium mt-0.5">Tasks Completed</div>
+          </div>
+
+          <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-[#E8E5F7] shadow-[0_4px_15px_rgba(124,92,255,0.04)] text-center">
+            <div className="text-2xl font-bold text-[#1E1B4B]">100%</div>
+            <div className="text-xs text-[#6B6396] font-medium mt-0.5">Free Forever</div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

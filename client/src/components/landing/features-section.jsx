@@ -1,20 +1,14 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import React from "react";
 import { 
   CheckSquare, 
-  Calendar, 
-  User, 
   BarChart3, 
   Smartphone, 
-  Shield,
-  Zap,
-  Folder,
-  Bell,
-  Grid,
-  List,
-  Archive,
-  Target,
-  Lock
+  Shield, 
+  Folder, 
+  List, 
+  Calendar, 
+  Lock, 
+  Sparkles 
 } from "lucide-react";
 
 const features = [
@@ -25,110 +19,86 @@ const features = [
     badge: "Core"
   },
   {
-    icon: Grid,
-    title: "Kanban Board View",
-    description: "Visualize your tasks in a modern Kanban board with drag-and-drop functionality and status tracking.",
-    badge: "Popular"
-  },
-  {
     icon: List,
-    title: "List View",
-    description: "Traditional list view with comprehensive task details, filters, and quick actions.",
-    badge: "Core"
+    title: "Real-Time Animated List",
+    description: "Natural staggered entrances, interactive check animations, and smooth slide-out deletions.",
+    badge: "Interactive"
   },
   {
     icon: BarChart3,
-    title: "Dashboard Analytics",
-    description: "Track your productivity with real-time statistics - total, completed, overdue, and archived tasks.",
+    title: "Dashboard Metrics",
+    description: "Track your progress with a calm animated progress bar and live completion counter.",
     badge: "Analytics"
   },
   {
     icon: Folder,
-    title: "Category Management",
-    description: "Organize tasks with custom categories and colors. Includes 4 default categories plus your own.",
+    title: "Category Tags",
+    description: "Organize tasks with categories like Work, Personal, Urgent, and General for quick filtering.",
     badge: "Core"
   },
   {
     icon: Smartphone,
     title: "Mobile Responsive",
-    description: "Fully responsive design that works perfectly on mobile devices with touch-friendly interface.",
-    badge: "Mobile"
+    description: "Designed intentionally for all screen sizes — mobile, tablet, and desktop.",
+    badge: "Design"
   },
   {
     icon: Shield,
-    title: "Secure Authentication",
-    description: "JWT-based authentication with user isolation. Your data is private and secure.",
-    badge: "Security"
-  },
-  {
-    icon: Archive,
-    title: "Task Archiving",
-    description: "Archive completed tasks to keep your workspace clean while preserving important data.",
-    badge: "Core"
-  },
-  {
-    icon: Bell,
-    title: "Smart Notifications",
-    description: "Real-time notifications for task operations with success and error feedback.",
-    badge: "Core"
-  },
-  {
-    icon: Target,
-    title: "Priority System",
-    description: "Set task priorities (low, medium, high) with color-coded indicators for better organization.",
-    badge: "Core"
-  },
-  {
-    icon: Calendar,
-    title: "Due Date Tracking",
-    description: "Set and track due dates with calendar integration and overdue task highlighting.",
-    badge: "Core"
-  },
-  {
-    icon: Lock,
-    title: "User Isolation",
-    description: "Each user has their own private workspace with isolated tasks and categories.",
+    title: "httpOnly Cookie Security",
+    description: "JWT-based authentication stored in httpOnly, SameSite cookies to protect against token theft.",
     badge: "Security"
   }
 ];
 
 export function FeaturesSection() {
   return (
-    <section id="features" className=" container space-y-6 bg-black py-8 md:py-12 lg:py-24">
-      <div className="mx-auto flex max-w-[980px] flex-col items-center gap-4">
-        <h2 className="text-center text-3xl font-bold leading-[1.1] sm:text-3xl md:text-6xl text-white">
-          Everything you need to stay <span className="text-blue-400">organized</span>
-        </h2>
-        <p className="max-w-[85%] text-center text-gray-400 sm:text-lg">
-          TaskFlow comes with all the features you need to manage your tasks efficiently 
-          and boost your productivity.
-        </p>
-      </div>
-      
-      <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
-        {features.map((feature, index) => {
-          const Icon = feature.icon;
-          return (
-            <Card key={index} className="relative overflow-hidden border-gray-800 bg-gray-900/50 backdrop-blur-sm hover:bg-gray-900/70 transition-all duration-300 hover:scale-[1.02]">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-                    <Icon className="h-5 w-5 text-white" />
+    <section id="features" className="py-20 bg-[#F3F0FC]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#1E1B4B] tracking-tight mb-4"
+            style={{ fontFamily: "'Fraunces', serif" }}
+          >
+            Everything you need to stay <span className="text-[#7C5CFF]">organized</span>
+          </h2>
+          <p className="text-base sm:text-lg text-[#6B6396]">
+            TaskFlow comes with all the features you need to manage your tasks efficiently in a calm, focused environment.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <div 
+                key={index} 
+                className="bg-white rounded-2xl p-6 border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] hover:shadow-[0_12px_35px_rgba(124,92,255,0.1)] transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-11 h-11 rounded-xl bg-[#F3F0FC] text-[#7C5CFF] flex items-center justify-center border border-[#E8E5F7]">
+                      <Icon size={22} />
+                    </div>
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#F3F0FC] text-[#7C5CFF] border border-[#E8E5F7]">
+                      {feature.badge}
+                    </span>
                   </div>
-                  <Badge variant="secondary" className="text-xs bg-gray-800 text-gray-300">
-                    {feature.badge}
-                  </Badge>
+
+                  <h3 
+                    className="text-xl font-bold text-[#1E1B4B] mb-2"
+                    style={{ fontFamily: "'Fraunces', serif" }}
+                  >
+                    {feature.title}
+                  </h3>
+
+                  <p className="text-sm text-[#6B6396] leading-relaxed">
+                    {feature.description}
+                  </p>
                 </div>
-                <CardTitle className="text-lg text-white">{feature.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-sm leading-relaxed text-gray-400">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

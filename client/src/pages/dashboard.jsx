@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Check, LogOut, Calendar, Tag, CheckCircle2 } from "lucide-react";
+import { Plus, Trash2, Check, LogOut, CheckCircle2, Sparkles, Filter } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../lib/api.js";
+import Navbar from "../components/layout/navbar.jsx";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -11,9 +12,8 @@ export default function Dashboard() {
   const [newTitle, setNewTitle] = useState("");
   const [newCategory, setNewCategory] = useState("Work");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [filter, setFilter] = useState("all"); // 'all', 'active', 'completed'
+  const [filter, setFilter] = useState("all");
 
-  // Fetch user tasks
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -32,7 +32,6 @@ export default function Dashboard() {
     }
   };
 
-  // Add a new task
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -58,9 +57,7 @@ export default function Dashboard() {
     }
   };
 
-  // Toggle completion status
   const handleToggleComplete = async (taskId, currentStatus) => {
-    // Optimistic update
     setTasks((prev) =>
       prev.map((t) => (t._id === taskId ? { ...t, completed: !currentStatus } : t))
     );
@@ -69,16 +66,13 @@ export default function Dashboard() {
       await api.put(`/tasks/${taskId}`, { completed: !currentStatus });
     } catch (err) {
       console.error("Failed to update task:", err);
-      // Revert if API fails
       setTasks((prev) =>
         prev.map((t) => (t._id === taskId ? { ...t, completed: currentStatus } : t))
       );
     }
   };
 
-  // Delete a task
   const handleDeleteTask = async (taskId) => {
-    // Optimistic delete
     const previousTasks = [...tasks];
     setTasks((prev) => prev.filter((t) => t._id !== taskId));
 
@@ -90,7 +84,6 @@ export default function Dashboard() {
     }
   };
 
-  // Metrics
   const completedCount = tasks.filter((t) => t.completed).length;
   const totalCount = tasks.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
@@ -102,70 +95,40 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#1C1B1A] font-sans flex flex-col">
-      {/* Header */}
-      <header className="bg-[#2D3B36] text-white sticky top-0 z-40 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <h1 
-              className="text-2xl md:text-3xl font-bold tracking-tight text-white"
-              style={{ fontFamily: "'Fraunces', serif" }}
-            >
-              TaskFlow
-            </h1>
-          </div>
+    <div className="min-h-screen bg-[#F8F6FE] text-[#1E1B4B] font-sans flex flex-col">
+      <Navbar />
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-[#E8603C] text-white flex items-center justify-center font-semibold text-sm shadow-sm">
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-              </div>
-              <span className="hidden sm:inline text-sm font-medium text-white/90">
-                {user?.name || "User"}
-              </span>
+      <main className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-8 pt-24 pb-20">
+        {/* Today's Focus Progress Section */}
+        <section className="mb-8 bg-white p-6 md:p-8 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_30px_rgba(124,92,255,0.06)]">
+          <div className="flex justify-between items-baseline mb-4">
+            <div>
+              <h2 
+                className="text-2xl md:text-3xl font-extrabold text-[#1E1B4B]"
+                style={{ fontFamily: "'Fraunces', serif" }}
+              >
+                Today's Focus
+              </h2>
+              <p className="text-xs text-[#6B6396] mt-0.5">Track your daily task completion rate</p>
             </div>
-
-            <button
-              onClick={logout}
-              className="flex items-center gap-1.5 text-xs md:text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-              title="Log out"
-            >
-              <LogOut size={16} />
-              <span className="hidden sm:inline">Logout</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-8 pt-8 pb-20">
-        {/* Today's Focus & Animated Progress Bar */}
-        <section className="mb-10 bg-white p-6 md:p-8 rounded-2xl border border-[#E5DFD6] shadow-[0_4px_20px_rgba(45,59,54,0.03)]">
-          <div className="flex justify-between items-baseline mb-3">
-            <h2 
-              className="text-xl md:text-2xl font-semibold text-[#2D3B36]"
-              style={{ fontFamily: "'Fraunces', serif" }}
-            >
-              Today's Focus
-            </h2>
-            <div className="text-sm font-medium text-[#6B6560]">
-              <span className="text-[#2D3B36] font-bold text-base">{completedCount}</span> of{" "}
+            <div className="text-sm font-semibold text-[#6B6396]">
+              <span className="text-[#7C5CFF] font-bold text-lg">{completedCount}</span> of{" "}
               <span>{totalCount}</span> tasks done
             </div>
           </div>
 
-          {/* Progress Bar Fill */}
-          <div className="h-2 w-full bg-[#FAF7F2] rounded-full overflow-hidden border border-[#E5DFD6]">
+          {/* Lavender Animated Progress Bar */}
+          <div className="h-3 w-full bg-[#F3F0FC] rounded-full overflow-hidden border border-[#E8E5F7] p-0.5">
             <motion.div
-              className="h-full bg-[#7A9B76] rounded-full"
+              className="h-full bg-gradient-to-r from-[#7C5CFF] to-[#6366F1] rounded-full shadow-[0_2px_10px_rgba(124,92,255,0.4)]"
               initial={{ width: 0 }}
               animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
             />
           </div>
         </section>
 
-        {/* Add Task Input Form */}
+        {/* Quick Add Task Input Form */}
         <section className="mb-8">
           <form onSubmit={handleAddTask} className="relative flex items-center">
             <input
@@ -173,13 +136,13 @@ export default function Dashboard() {
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="What needs to be done today?"
-              className="w-full bg-white border border-[#E5DFD6] focus:border-[#E8603C] rounded-2xl px-5 py-4 pr-16 text-[#1C1B1A] placeholder-[#6B6560]/50 shadow-[0_4px_20px_rgba(45,59,54,0.03)] outline-none transition-all text-base md:text-lg"
+              className="w-full bg-white border border-[#E8E5F7] focus:border-[#7C5CFF] rounded-2xl px-5 py-4 pr-16 text-[#1E1B4B] placeholder-[#6B6396]/50 shadow-[0_4px_20px_rgba(124,92,255,0.04)] outline-none transition-all text-base md:text-lg font-medium"
             />
 
             <button
               type="submit"
               disabled={!newTitle.trim() || isSubmitting}
-              className="absolute right-3 bg-[#E8603C] hover:bg-[#d05230] text-white p-2.5 rounded-xl transition-all disabled:opacity-40 disabled:hover:bg-[#E8603C] cursor-pointer"
+              className="absolute right-3 bg-[#7C5CFF] hover:bg-[#6366F1] text-white p-2.5 rounded-xl transition-all disabled:opacity-40 cursor-pointer shadow-[0_4px_12px_rgba(124,92,255,0.3)]"
               title="Add Task"
             >
               <Plus size={20} />
@@ -188,16 +151,16 @@ export default function Dashboard() {
 
           {/* Category Selector */}
           <div className="flex items-center gap-2 mt-3 px-1">
-            <span className="text-xs text-[#6B6560] font-medium mr-1">Category:</span>
+            <span className="text-xs text-[#6B6396] font-semibold mr-1">Category:</span>
             {["Work", "Personal", "Urgent", "General"].map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setNewCategory(cat)}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors cursor-pointer ${
+                className={`text-xs px-3 py-1 rounded-full border transition-all cursor-pointer font-medium ${
                   newCategory === cat
-                    ? "bg-[#2D3B36] text-white border-[#2D3B36]"
-                    : "bg-white text-[#6B6560] border-[#E5DFD6] hover:border-[#2D3B36]/40"
+                    ? "bg-[#7C5CFF] text-white border-[#7C5CFF] shadow-[0_2px_8px_rgba(124,92,255,0.3)]"
+                    : "bg-white text-[#6B6396] border-[#E8E5F7] hover:border-[#7C5CFF]"
                 }`}
               >
                 {cat}
@@ -208,14 +171,14 @@ export default function Dashboard() {
 
         {/* Task Filter Tabs */}
         {totalCount > 0 && (
-          <div className="flex items-center justify-between border-b border-[#E5DFD6] pb-3 mb-6">
-            <div className="flex items-center gap-4 text-sm font-medium">
+          <div className="flex items-center justify-between border-b border-[#E8E5F7] pb-3 mb-6">
+            <div className="flex items-center gap-6 text-sm font-semibold">
               <button
                 onClick={() => setFilter("all")}
                 className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filter === "all"
-                    ? "border-[#E8603C] text-[#2D3B36]"
-                    : "border-transparent text-[#6B6560] hover:text-[#2D3B36]"
+                    ? "border-[#7C5CFF] text-[#7C5CFF]"
+                    : "border-transparent text-[#6B6396] hover:text-[#1E1B4B]"
                 }`}
               >
                 All ({totalCount})
@@ -224,8 +187,8 @@ export default function Dashboard() {
                 onClick={() => setFilter("active")}
                 className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filter === "active"
-                    ? "border-[#E8603C] text-[#2D3B36]"
-                    : "border-transparent text-[#6B6560] hover:text-[#2D3B36]"
+                    ? "border-[#7C5CFF] text-[#7C5CFF]"
+                    : "border-transparent text-[#6B6396] hover:text-[#1E1B4B]"
                 }`}
               >
                 Active ({totalCount - completedCount})
@@ -234,8 +197,8 @@ export default function Dashboard() {
                 onClick={() => setFilter("completed")}
                 className={`pb-2 border-b-2 transition-colors cursor-pointer ${
                   filter === "completed"
-                    ? "border-[#E8603C] text-[#2D3B36]"
-                    : "border-transparent text-[#6B6560] hover:text-[#2D3B36]"
+                    ? "border-[#7C5CFF] text-[#7C5CFF]"
+                    : "border-transparent text-[#6B6396] hover:text-[#1E1B4B]"
                 }`}
               >
                 Completed ({completedCount})
@@ -247,8 +210,8 @@ export default function Dashboard() {
         {/* Task List / Loading State / Empty State */}
         {loading ? (
           <div className="py-16 text-center">
-            <div className="inline-block w-8 h-8 border-3 border-[#2D3B36] border-t-transparent rounded-full animate-spin mb-3"></div>
-            <p className="text-[#6B6560] text-sm">Fetching your tasks...</p>
+            <div className="inline-block w-8 h-8 border-3 border-[#7C5CFF] border-t-transparent rounded-full animate-spin mb-3"></div>
+            <p className="text-[#6B6396] text-sm font-medium">Fetching your tasks...</p>
           </div>
         ) : filteredTasks.length === 0 ? (
           /* Empty State */
@@ -256,13 +219,13 @@ export default function Dashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-white rounded-2xl p-12 text-center border border-[#E5DFD6] shadow-sm my-4"
+            className="bg-white rounded-3xl p-12 text-center border border-[#E8E5F7] shadow-[0_8px_30px_rgba(124,92,255,0.04)] my-4"
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FAF7F2] text-[#7A9B76] flex items-center justify-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#F3F0FC] text-[#7C5CFF] flex items-center justify-center border border-[#E8E5F7]">
               <CheckCircle2 size={32} />
             </div>
             <h3 
-              className="text-xl font-semibold text-[#2D3B36] mb-2"
+              className="text-xl font-bold text-[#1E1B4B] mb-2"
               style={{ fontFamily: "'Fraunces', serif" }}
             >
               {filter === "completed"
@@ -271,9 +234,9 @@ export default function Dashboard() {
                 ? "No active tasks right now"
                 : "Your task list is clear"}
             </h3>
-            <p className="text-[#6B6560] text-sm max-w-sm mx-auto">
+            <p className="text-[#6B6396] text-sm max-w-sm mx-auto">
               {filter === "all"
-                ? "Add a new task above to begin organizing your day with clarity."
+                ? "Add a new task above to begin organizing your day with calm clarity."
                 : "Items will appear here once you add or complete tasks."}
             </p>
           </motion.div>
@@ -289,20 +252,20 @@ export default function Dashboard() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, x: -50, height: 0, marginBottom: 0, padding: 0 }}
                   transition={{ duration: 0.35, ease: "easeOut" }}
-                  className={`bg-white rounded-xl p-4 md:p-5 border transition-all flex items-center gap-4 group ${
+                  className={`bg-white rounded-2xl p-4 md:p-5 border transition-all flex items-center gap-4 group ${
                     task.completed
-                      ? "border-[#E5DFD6]/60 bg-white/70 opacity-75"
-                      : "border-[#E5DFD6] hover:border-[#2D3B36]/30 shadow-[0_2px_12px_rgba(45,59,54,0.03)]"
+                      ? "border-[#E8E5F7]/60 bg-white/70 opacity-70"
+                      : "border-[#E8E5F7] hover:border-[#7C5CFF]/40 shadow-[0_4px_15px_rgba(124,92,255,0.04)]"
                   }`}
                 >
-                  {/* Motion Checkbox Toggle */}
+                  {/* Lavender Motion Checkbox Toggle */}
                   <button
                     type="button"
                     onClick={() => handleToggleComplete(task._id, task.completed)}
-                    className={`w-6 h-6 rounded-md border flex items-center justify-center transition-all duration-200 cursor-pointer flex-shrink-0 ${
+                    className={`w-6 h-6 rounded-lg border flex items-center justify-center transition-all duration-200 cursor-pointer flex-shrink-0 ${
                       task.completed
-                        ? "bg-[#7A9B76] border-[#7A9B76] text-white"
-                        : "border-[#2D3B36]/40 hover:border-[#7A9B76] bg-transparent"
+                        ? "bg-[#7C5CFF] border-[#7C5CFF] text-white shadow-[0_2px_8px_rgba(124,92,255,0.4)]"
+                        : "border-[#1E1B4B]/30 hover:border-[#7C5CFF] bg-transparent"
                     }`}
                     aria-label={task.completed ? "Mark task incomplete" : "Mark task complete"}
                   >
@@ -320,8 +283,8 @@ export default function Dashboard() {
                     <span
                       className={`block text-base transition-all duration-200 truncate ${
                         task.completed
-                          ? "line-through text-[#6B6560]"
-                          : "text-[#1C1B1A] font-medium"
+                          ? "line-through text-[#6B6396]"
+                          : "text-[#1E1B4B] font-semibold"
                       }`}
                     >
                       {task.title}
@@ -329,7 +292,7 @@ export default function Dashboard() {
 
                     {task.category && (
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-[#FAF7F2] text-[#6B6560] border border-[#E5DFD6]">
+                        <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-[#F3F0FC] text-[#7C5CFF] border border-[#E8E5F7]">
                           {task.category}
                         </span>
                       </div>
@@ -340,7 +303,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => handleDeleteTask(task._id)}
-                    className="opacity-0 group-hover:opacity-100 text-[#6B6560] hover:text-[#E8603C] p-2 rounded-lg hover:bg-[#FFF5F2] transition-all cursor-pointer flex-shrink-0"
+                    className="opacity-0 group-hover:opacity-100 text-[#6B6396] hover:text-[#FF4D4D] p-2 rounded-xl hover:bg-[#FFF5F7] transition-all cursor-pointer flex-shrink-0"
                     title="Delete task"
                   >
                     <Trash2 size={18} />

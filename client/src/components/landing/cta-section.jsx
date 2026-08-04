@@ -1,44 +1,39 @@
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, CheckSquare } from "lucide-react";
 
 export function CTASection() {
-  // Simple navigation function
-  const navigate = (path) => {
-    window.history.pushState({}, '', path);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
   return (
-    <section className="border-t border-gray-800 bg-black">
-      <div className="container flex flex-col items-center justify-center gap-4 py-8 md:py-12 lg:py-24">
-        <div className="mx-auto flex max-w-[980px] flex-col items-center gap-4 text-center">
-          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-blue-600/20 mb-4">
-            <CheckSquare className="h-8 w-8 text-blue-400" />
-          </div>
-          
-          <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl text-white">
-            Ready to boost your <span className="text-blue-400">productivity</span>?
-          </h2>
-          
-          <p className="max-w-[85%] text-gray-400 sm:text-lg">
-            Join thousands of users who have transformed their task management with TaskFlow. 
-            Start organizing your tasks today - completely free, no strings attached.
-          </p>
-          
-          <div className="flex flex-col gap-2 min-[400px]:flex-row mt-4">
-            <Button size="lg" className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white" onClick={() => navigate('/signup')}>
-              Get Started Free
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="lg" className="h-12 px-8 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white">
-              Learn More
-            </Button>
-          </div>
-          
-          <p className="text-xs text-gray-500 mt-4">
-            No credit card required • No hidden fees • No limitations • Free forever
-          </p>
+    <section className="py-20 bg-animated-mesh border-t border-[#E8E5F7]">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-[#7C5CFF] text-white flex items-center justify-center mx-auto mb-6 shadow-[0_8px_25px_rgba(124,92,255,0.35)]">
+          <CheckSquare size={32} />
         </div>
+
+        <h2 
+          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1E1B4B] tracking-tight mb-4"
+          style={{ fontFamily: "'Fraunces', serif" }}
+        >
+          Ready to boost your <span className="text-[#7C5CFF]">productivity</span>?
+        </h2>
+
+        <p className="text-base sm:text-lg text-[#6B6396] max-w-xl mx-auto mb-8">
+          Join users who have transformed their task management with TaskFlow. Start organizing your daily focus today.
+        </p>
+
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link
+            to="/register"
+            className="bg-[#7C5CFF] hover:bg-[#6366F1] text-white font-semibold py-4 px-8 rounded-2xl shadow-[0_8px_25px_rgba(124,92,255,0.35)] transition-all hover:scale-[1.02] flex items-center justify-center gap-2 text-base"
+          >
+            <span>Get Started Free</span>
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+
+        <p className="text-xs text-[#6B6396] mt-6">
+          No credit card required • 100% Free • Secure httpOnly cookies
+        </p>
       </div>
     </section>
   );
