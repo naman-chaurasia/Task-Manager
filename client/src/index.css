@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: #FAF7F2;
+    --foreground: #1C1B1A;
+    --card: #FFFFFF;
+    --card-foreground: #1C1B1A;
+    --primary: #2D3B36;
+    --primary-foreground: #FFFFFF;
+    --accent: #E8603C;
+    --accent-foreground: #FFFFFF;
+    --success: #7A9B76;
+    --success-foreground: #FFFFFF;
+    --muted: #6B6560;
+    --border: #E5DFD6;
+    --radius: 0.75rem;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .font-serif-fraunces {
+    font-family: 'Fraunces', serif;
+  }
+}
+
+/* Custom Utilities for Editorial Aesthetics */
+.shadow-soft {
+  box-shadow: 0px 8px 24px rgba(45, 59, 54, 0.04);
+}
+
+.shadow-elevated {
+  box-shadow: 0px 16px 48px rgba(45, 59, 54, 0.08);
+}
+
+.input-minimal {
+  border: none;
+  border-bottom: 1px solid #2D3B36;
+  border-radius: 0;
+  background-color: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  transition: border-color 0.2s ease;
+}
+
+.input-minimal:focus {
+  outline: none;
+  border-bottom-color: #E8603C;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
