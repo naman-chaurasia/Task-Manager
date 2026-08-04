@@ -11,7 +11,11 @@ import {
   Search, 
   BarChart3, 
   Sparkles,
-  Tag,
+  ArrowRight,
+  ArrowLeft,
+  Clock,
+  CircleCheck,
+  CircleDashed,
   AlertCircle
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -67,7 +71,8 @@ export default function Dashboard() {
         category: newCategory,
         priority: newPriority,
         completed: false,
-        archived: false
+        archived: false,
+        kanbanStatus: "todo"
       });
 
       if (res.data?.success && res.data?.data?.task) {
@@ -80,18 +85,32 @@ export default function Dashboard() {
     }
   };
 
-  const handleToggleComplete = async (taskId, currentStatus) => {
+  const handleUpdateStatus = async (taskId, newStatus, isCompleted = false) => {
     setTasks((prev) =>
-      prev.map((t) => (t._id === taskId ? { ...t, completed: !currentStatus } : t))
+      prev.map((t) => (t._id === taskId ? { ...t, kanbanStatus: newStatus, completed: isCompleted } : t))
     );
 
     try {
-      await api.put(`/tasks/${taskId}`, { completed: !currentStatus });
+      await api.put(`/tasks/${taskId}`, { kanbanStatus: newStatus, completed: isCompleted });
+    } catch (err) {
+      console.error("Failed to update task status:", err);
+      fetchTasks();
+    }
+  };
+
+  const handleToggleComplete = async (taskId, currentStatus) => {
+    const nextCompleted = !currentStatus;
+    const nextKanbanStatus = nextCompleted ? "completed" : "todo";
+
+    setTasks((prev) =>
+      prev.map((t) => (t._id === taskId ? { ...t, completed: nextCompleted, kanbanStatus: nextKanbanStatus } : t))
+    );
+
+    try {
+      await api.put(`/tasks/${taskId}`, { completed: nextCompleted, kanbanStatus: nextKanbanStatus });
     } catch (err) {
       console.error("Failed to update task:", err);
-      setTasks((prev) =>
-        prev.map((t) => (t._id === taskId ? { ...t, completed: currentStatus } : t))
-      );
+      fetchTasks();
     }
   };
 
@@ -122,10 +141,16 @@ export default function Dashboard() {
   // Analytics Calculations
   const activeTasks = tasks.filter((t) => !t.archived);
   const totalCount = activeTasks.length;
-  const completedCount = activeTasks.filter((t) => t.completed).length;
-  const pendingCount = totalCount - completedCount;
+  const completedCount = activeTasks.filter((t) => t.completed || t.kanbanStatus === "completed").length;
+  const inProgressCount = activeTasks.filter((t) => t.kanbanStatus === "in-progress" && !t.completed).length;
+  const todoCount = Math.max(0, totalCount - completedCount - inProgressCount);
   const archivedCount = tasks.filter((t) => t.archived).length;
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+  // SVG Circular Chart calculations
+  const radius = 42;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (completionRate / 100) * circumference;
 
   // Filtering
   const displayedTasks = tasks.filter((task) => {
@@ -153,82 +178,121 @@ export default function Dashboard() {
               Welcome back, {user?.name || "Focus User"} 👋
             </h1>
             <p className="text-sm text-[#6B6396] mt-1">
-              Here is your daily task & productivity analytics overview.
+              Here is your interactive task manager & circular analytics dashboard.
             </p>
           </div>
 
-          {/* View Toggle Mode */}
-          <div className="flex items-center gap-1 bg-white p-1 rounded-2xl border border-[#E8E5F7] shadow-sm">
+          {/* View Mode Selector */}
+          <div className="flex items-center gap-1 bg-white p-1.5 rounded-2xl border border-[#E8E5F7] shadow-sm">
             <button
               onClick={() => setViewMode("list")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "list"
-                  ? "bg-[#7C5CFF] text-white shadow-[0_2px_8px_rgba(124,92,255,0.3)]"
+                  ? "bg-[#7C5CFF] text-white shadow-[0_4px_12px_rgba(124,92,255,0.35)]"
                   : "text-[#6B6396] hover:text-[#1E1B4B]"
               }`}
             >
-              <List size={14} />
+              <List size={15} />
               <span>List View</span>
             </button>
 
             <button
               onClick={() => setViewMode("kanban")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 viewMode === "kanban"
-                  ? "bg-[#7C5CFF] text-white shadow-[0_2px_8px_rgba(124,92,255,0.3)]"
+                  ? "bg-[#7C5CFF] text-white shadow-[0_4px_12px_rgba(124,92,255,0.35)]"
                   : "text-[#6B6396] hover:text-[#1E1B4B]"
               }`}
             >
-              <Grid size={14} />
+              <Grid size={15} />
               <span>Kanban Board</span>
             </button>
           </div>
         </div>
 
-        {/* Analytics Summary Cards Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)]">
-            <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider mb-2">
-              <span>Total Tasks</span>
-              <BarChart3 size={16} className="text-[#7C5CFF]" />
+        {/* Top Circular Analytics & Summary Card Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Circular Chart Analytics Card */}
+          <div className="bg-white p-6 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_30px_rgba(124,92,255,0.06)] flex items-center justify-between">
+            <div>
+              <span className="text-xs font-bold text-[#6B6396] uppercase tracking-wider block mb-1">
+                Progress Chart
+              </span>
+              <h3 className="text-xl font-bold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
+                Task Completion
+              </h3>
+              <p className="text-xs text-[#6B6396] mt-1 font-medium">
+                {completedCount} of {totalCount} tasks completed
+              </p>
             </div>
-            <div className="text-3xl font-extrabold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
-              {totalCount}
+
+            {/* Circular Progress SVG */}
+            <div className="relative w-24 h-24 flex items-center justify-center">
+              <svg className="w-24 h-24 transform -rotate-90">
+                <circle
+                  cx="48"
+                  cy="48"
+                  r={radius}
+                  stroke="#F3F0FC"
+                  strokeWidth="8"
+                  fill="transparent"
+                />
+                <motion.circle
+                  cx="48"
+                  cy="48"
+                  r={radius}
+                  stroke="#7C5CFF"
+                  strokeWidth="8"
+                  strokeDasharray={circumference}
+                  initial={{ strokeDashoffset: circumference }}
+                  animate={{ strokeDashoffset }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                  strokeLinecap="round"
+                  fill="transparent"
+                />
+              </svg>
+              <div className="absolute flex flex-col items-center justify-center">
+                <span className="text-lg font-extrabold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
+                  {completionRate}%
+                </span>
+              </div>
             </div>
-            <div className="text-xs text-[#6B6396] mt-1 font-medium">Active in workspace</div>
           </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)]">
-            <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider mb-2">
-              <span>Completed</span>
-              <CheckCircle2 size={16} className="text-[#7C5CFF]" />
+          {/* Quick Metrics Grid */}
+          <div className="lg:col-span-2 grid grid-cols-3 gap-4">
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
+                <span>To Do</span>
+                <CircleDashed size={16} className="text-[#6B6396]" />
+              </div>
+              <div className="text-3xl font-extrabold text-[#1E1B4B] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+                {todoCount}
+              </div>
+              <div className="text-xs text-[#6B6396] font-medium">Pending start</div>
             </div>
-            <div className="text-3xl font-extrabold text-[#7C5CFF]" style={{ fontFamily: "'Fraunces', serif" }}>
-              {completedCount}
-            </div>
-            <div className="text-xs text-[#6B6396] mt-1 font-medium">{completionRate}% completion rate</div>
-          </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)]">
-            <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider mb-2">
-              <span>Pending</span>
-              <AlertCircle size={16} className="text-[#6366F1]" />
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
+                <span>In Progress</span>
+                <Clock size={16} className="text-[#6366F1]" />
+              </div>
+              <div className="text-3xl font-extrabold text-[#6366F1] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+                {inProgressCount}
+              </div>
+              <div className="text-xs text-[#6B6396] font-medium">Active work</div>
             </div>
-            <div className="text-3xl font-extrabold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
-              {pendingCount}
-            </div>
-            <div className="text-xs text-[#6B6396] mt-1 font-medium">Requires focus</div>
-          </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)]">
-            <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider mb-2">
-              <span>Archived</span>
-              <Archive size={16} className="text-[#6B6396]" />
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
+                <span>Completed</span>
+                <CircleCheck size={16} className="text-[#7C5CFF]" />
+              </div>
+              <div className="text-3xl font-extrabold text-[#7C5CFF] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+                {completedCount}
+              </div>
+              <div className="text-xs text-[#6B6396] font-medium">Finished tasks</div>
             </div>
-            <div className="text-3xl font-extrabold text-[#6B6396]" style={{ fontFamily: "'Fraunces', serif" }}>
-              {archivedCount}
-            </div>
-            <div className="text-xs text-[#6B6396] mt-1 font-medium">Saved tasks</div>
           </div>
         </div>
 
@@ -239,7 +303,7 @@ export default function Dashboard() {
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Add a new task title..."
+              placeholder="What needs to be done today?"
               className="flex-1 w-full bg-[#F8F6FE] border border-[#E8E5F7] focus:border-[#7C5CFF] rounded-2xl px-5 py-3.5 text-[#1E1B4B] placeholder-[#6B6396]/50 outline-none transition-all text-base font-medium"
             />
 
@@ -278,7 +342,7 @@ export default function Dashboard() {
           </form>
         </section>
 
-        {/* Filter & Search Toolbar */}
+        {/* Toolbar & Filter Bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1">
             <span className="text-xs text-[#6B6396] font-semibold mr-1">Filter:</span>
@@ -289,7 +353,7 @@ export default function Dashboard() {
                   setFilterCategory(cat);
                   setShowArchived(false);
                 }}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer whitespace-nowrap ${
+                className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all cursor-pointer whitespace-nowrap ${
                   filterCategory === cat && !showArchived
                     ? "bg-[#7C5CFF] text-white border-[#7C5CFF] shadow-[0_2px_8px_rgba(124,92,255,0.3)]"
                     : "bg-white text-[#6B6396] border-[#E8E5F7] hover:border-[#7C5CFF]"
@@ -301,7 +365,7 @@ export default function Dashboard() {
 
             <button
               onClick={() => setShowArchived(!showArchived)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`text-xs font-semibold px-3.5 py-1.5 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 ${
                 showArchived
                   ? "bg-[#1E1B4B] text-white border-[#1E1B4B]"
                   : "bg-white text-[#6B6396] border-[#E8E5F7] hover:border-[#1E1B4B]"
@@ -324,7 +388,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Task Display Views */}
+        {/* Main Display Views */}
         {loading ? (
           <div className="py-20 text-center">
             <div className="inline-block w-8 h-8 border-3 border-[#7C5CFF] border-t-transparent rounded-full animate-spin mb-3"></div>
@@ -332,7 +396,7 @@ export default function Dashboard() {
           </div>
         ) : displayedTasks.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-[#E8E5F7] shadow-[0_8px_30px_rgba(124,92,255,0.04)]">
-            <CheckCircle2 size={36} className="text-[#7C5CFF] mx-auto mb-3" />
+            <CircleCheck size={38} className="text-[#7C5CFF] mx-auto mb-3" />
             <h3 className="text-xl font-bold text-[#1E1B4B] mb-1" style={{ fontFamily: "'Fraunces', serif" }}>
               No tasks found
             </h3>
@@ -341,60 +405,134 @@ export default function Dashboard() {
             </p>
           </div>
         ) : viewMode === "kanban" ? (
-          /* Kanban Board View */
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* In Progress / Active Column */}
-            <div className="bg-white p-6 rounded-3xl border border-[#E8E5F7] shadow-sm">
-              <h3 className="text-lg font-bold text-[#1E1B4B] mb-4 flex items-center justify-between" style={{ fontFamily: "'Fraunces', serif" }}>
-                <span>In Progress</span>
-                <span className="text-xs bg-[#F3F0FC] text-[#7C5CFF] px-2.5 py-0.5 rounded-full">
-                  {displayedTasks.filter(t => !t.completed).length}
+          /* Interactive 3-Column Kanban Board */
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Column 1: To Do */}
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E8E5F7]">
+                <div className="flex items-center gap-2 font-bold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
+                  <CircleDashed size={16} className="text-[#6B6396]" />
+                  <span>To Do</span>
+                </div>
+                <span className="text-xs font-semibold bg-[#F3F0FC] text-[#7C5CFF] px-2.5 py-0.5 rounded-full">
+                  {displayedTasks.filter(t => !t.completed && (t.kanbanStatus === "todo" || !t.kanbanStatus)).length}
                 </span>
-              </h3>
-              <div className="space-y-3">
-                {displayedTasks.filter(t => !t.completed).map(task => (
-                  <div key={task._id} className="p-4 rounded-2xl bg-[#F8F6FE] border border-[#E8E5F7]">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-semibold text-sm text-[#1E1B4B]">{task.title}</span>
-                      <button
-                        onClick={() => handleToggleComplete(task._id, false)}
-                        className="text-xs font-semibold bg-[#7C5CFF] text-white px-2.5 py-1 rounded-xl cursor-pointer"
-                      >
-                        Complete
-                      </button>
-                    </div>
-                    <div className="flex items-center gap-2 mt-3">
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-[#7C5CFF] border border-[#E8E5F7]">
-                        {task.category || "General"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              </div>
+
+              <div className="space-y-3 flex-1 min-h-[150px]">
+                {displayedTasks
+                  .filter(t => !t.completed && (t.kanbanStatus === "todo" || !t.kanbanStatus))
+                  .map(task => (
+                    <motion.div
+                      layout
+                      key={task._id}
+                      className="p-4 rounded-2xl bg-[#F8F6FE] border border-[#E8E5F7] hover:border-[#7C5CFF]/40 transition-all shadow-sm group"
+                    >
+                      <div className="font-semibold text-sm text-[#1E1B4B] mb-2">{task.title}</div>
+                      
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#E8E5F7]/60">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-[#7C5CFF] border border-[#E8E5F7]">
+                          {task.category || "General"}
+                        </span>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => handleUpdateStatus(task._id, "in-progress", false)}
+                            className="text-xs font-semibold bg-white border border-[#E8E5F7] hover:border-[#7C5CFF] text-[#7C5CFF] px-2 py-1 rounded-xl flex items-center gap-1 cursor-pointer transition-colors"
+                            title="Move to In Progress"
+                          >
+                            <span>Progress</span>
+                            <ArrowRight size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
               </div>
             </div>
 
-            {/* Completed Column */}
-            <div className="bg-white p-6 rounded-3xl border border-[#E8E5F7] shadow-sm">
-              <h3 className="text-lg font-bold text-[#1E1B4B] mb-4 flex items-center justify-between" style={{ fontFamily: "'Fraunces', serif" }}>
-                <span>Completed</span>
-                <span className="text-xs bg-[#F3F0FC] text-[#7C5CFF] px-2.5 py-0.5 rounded-full">
-                  {displayedTasks.filter(t => t.completed).length}
+            {/* Column 2: In Progress */}
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E8E5F7]">
+                <div className="flex items-center gap-2 font-bold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
+                  <Clock size={16} className="text-[#6366F1]" />
+                  <span>In Progress</span>
+                </div>
+                <span className="text-xs font-semibold bg-[#F3F0FC] text-[#6366F1] px-2.5 py-0.5 rounded-full">
+                  {displayedTasks.filter(t => !t.completed && t.kanbanStatus === "in-progress").length}
                 </span>
-              </h3>
-              <div className="space-y-3">
-                {displayedTasks.filter(t => t.completed).map(task => (
-                  <div key={task._id} className="p-4 rounded-2xl bg-white border border-[#E8E5F7] opacity-80">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-semibold text-sm line-through text-[#6B6396]">{task.title}</span>
-                      <button
-                        onClick={() => handleToggleComplete(task._id, true)}
-                        className="text-xs font-semibold bg-[#F3F0FC] text-[#7C5CFF] px-2.5 py-1 rounded-xl cursor-pointer"
-                      >
-                        Undo
-                      </button>
-                    </div>
-                  </div>
-                ))}
+              </div>
+
+              <div className="space-y-3 flex-1 min-h-[150px]">
+                {displayedTasks
+                  .filter(t => !t.completed && t.kanbanStatus === "in-progress")
+                  .map(task => (
+                    <motion.div
+                      layout
+                      key={task._id}
+                      className="p-4 rounded-2xl bg-[#F3F0FC]/60 border border-[#E8E5F7] hover:border-[#6366F1]/40 transition-all shadow-sm group"
+                    >
+                      <div className="font-semibold text-sm text-[#1E1B4B] mb-2">{task.title}</div>
+                      
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#E8E5F7]/60">
+                        <button
+                          onClick={() => handleUpdateStatus(task._id, "todo", false)}
+                          className="text-xs font-semibold bg-white border border-[#E8E5F7] text-[#6B6396] hover:text-[#1E1B4B] px-2 py-1 rounded-xl flex items-center gap-1 cursor-pointer"
+                        >
+                          <ArrowLeft size={12} />
+                          <span>To Do</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleUpdateStatus(task._id, "completed", true)}
+                          className="text-xs font-semibold bg-[#7C5CFF] text-white px-2.5 py-1 rounded-xl flex items-center gap-1 cursor-pointer shadow-[0_2px_8px_rgba(124,92,255,0.3)]"
+                        >
+                          <span>Done</span>
+                          <Check size={12} strokeWidth={3} />
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+              </div>
+            </div>
+
+            {/* Column 3: Completed */}
+            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E8E5F7]">
+                <div className="flex items-center gap-2 font-bold text-[#1E1B4B]" style={{ fontFamily: "'Fraunces', serif" }}>
+                  <CircleCheck size={16} className="text-[#7C5CFF]" />
+                  <span>Completed</span>
+                </div>
+                <span className="text-xs font-semibold bg-[#F3F0FC] text-[#7C5CFF] px-2.5 py-0.5 rounded-full">
+                  {displayedTasks.filter(t => t.completed || t.kanbanStatus === "completed").length}
+                </span>
+              </div>
+
+              <div className="space-y-3 flex-1 min-h-[150px]">
+                {displayedTasks
+                  .filter(t => t.completed || t.kanbanStatus === "completed")
+                  .map(task => (
+                    <motion.div
+                      layout
+                      key={task._id}
+                      className="p-4 rounded-2xl bg-white border border-[#E8E5F7] opacity-80"
+                    >
+                      <div className="font-semibold text-sm line-through text-[#6B6396] mb-2">{task.title}</div>
+                      
+                      <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#E8E5F7]/60">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F3F0FC] text-[#7C5CFF]">
+                          Done
+                        </span>
+
+                        <button
+                          onClick={() => handleUpdateStatus(task._id, "in-progress", false)}
+                          className="text-xs font-semibold bg-[#F3F0FC] text-[#7C5CFF] px-2 py-1 rounded-xl cursor-pointer"
+                        >
+                          Undo
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
               </div>
             </div>
           </div>
