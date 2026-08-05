@@ -19,7 +19,7 @@ export const getTasks = async (req, res) => {
 // POST /api/tasks - Create a new task
 export const createTask = async (req, res) => {
     try {
-        const { title, description, completed, dueDate, category } = req.body;
+        const { title, description, completed, dueDate, category, priority, archived, kanbanStatus } = req.body;
 
         if (!title || !title.trim()) {
             return res.status(400).json({
@@ -34,7 +34,10 @@ export const createTask = async (req, res) => {
             description: description ? description.trim() : "",
             completed: Boolean(completed),
             dueDate: dueDate ? new Date(dueDate) : null,
-            category: category || "General"
+            category: category || "General",
+            priority: priority || "medium",
+            archived: Boolean(archived),
+            kanbanStatus: kanbanStatus || (completed ? "completed" : "todo")
         });
 
         res.status(201).json({
@@ -71,12 +74,15 @@ export const updateTask = async (req, res) => {
             });
         }
 
-        const { title, description, completed, dueDate, category } = req.body;
+        const { title, description, completed, dueDate, category, priority, archived, kanbanStatus } = req.body;
         if (title !== undefined) task.title = title.trim();
         if (description !== undefined) task.description = description.trim();
         if (completed !== undefined) task.completed = Boolean(completed);
         if (dueDate !== undefined) task.dueDate = dueDate ? new Date(dueDate) : null;
         if (category !== undefined) task.category = category;
+        if (priority !== undefined) task.priority = priority;
+        if (archived !== undefined) task.archived = Boolean(archived);
+        if (kanbanStatus !== undefined) task.kanbanStatus = kanbanStatus;
 
         await task.save();
 

@@ -27,6 +27,20 @@ const taskSchema = new mongoose.Schema(
             trim: true,
             default: 'General'
         },
+        priority: {
+            type: String,
+            enum: ['low', 'medium', 'high'],
+            default: 'medium'
+        },
+        archived: {
+            type: Boolean,
+            default: false
+        },
+        kanbanStatus: {
+            type: String,
+            enum: ['todo', 'in-progress', 'completed'],
+            default: 'todo'
+        },
         dueDate: {
             type: Date
         }

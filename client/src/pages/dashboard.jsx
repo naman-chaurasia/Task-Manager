@@ -32,6 +32,7 @@ export default function Dashboard() {
   const [newCategory, setNewCategory] = useState("Work");
   const [newPriority, setNewPriority] = useState("medium");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addError, setAddError] = useState("");
 
   // View & Filter State
   const [viewMode, setViewMode] = useState("list"); // 'list' or 'kanban'
@@ -59,10 +60,10 @@ export default function Dashboard() {
 
   const handleAddTask = async (e) => {
     e.preventDefault();
-    if (!newTitle.trim()) return;
+    if (!newTitle.trim() || isSubmitting) return;
 
     const titleToAdd = newTitle.trim();
-    setNewTitle("");
+    setAddError("");
     setIsSubmitting(true);
 
     try {
@@ -75,11 +76,28 @@ export default function Dashboard() {
         kanbanStatus: "todo"
       });
 
-      if (res.data?.success && res.data?.data?.task) {
-        setTasks((prev) => [res.data.data.task, ...prev]);
+      const addedTask = res.data?.data?.task || res.data?.task;
+      if (addedTask) {
+        setTasks((prev) => [addedTask, ...prev]);
+        setNewTitle("");
+      } else {
+        const fallbackTask = {
+          _id: Date.now().toString(),
+          title: titleToAdd,
+          category: newCategory,
+          priority: newPriority,
+          completed: false,
+          archived: false,
+          kanbanStatus: "todo",
+          createdAt: new Date().toISOString()
+        };
+        setTasks((prev) => [fallbackTask, ...prev]);
+        setNewTitle("");
       }
     } catch (err) {
       console.error("Failed to add task:", err);
+      const msg = err.response?.data?.message || "Failed to add task. Please check your connection.";
+      setAddError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -260,58 +278,64 @@ export default function Dashboard() {
           </div>
 
           {/* Quick Metrics Grid */}
-          <div className="lg:col-span-2 grid grid-cols-3 gap-4">
-            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
-              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
+          <div className="lg:col-span-2 grid grid-cols-3 gap-2 sm:gap-4">
+            <div className="bg-white p-3.5 sm:p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
                 <span>To Do</span>
-                <CircleDashed size={16} className="text-[#6B6396]" />
+                <CircleDashed size={14} className="text-[#6B6396]" />
               </div>
-              <div className="text-3xl font-extrabold text-[#1E1B4B] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#1E1B4B] my-1 sm:my-2" style={{ fontFamily: "'Fraunces', serif" }}>
                 {todoCount}
               </div>
-              <div className="text-xs text-[#6B6396] font-medium">Pending start</div>
+              <div className="text-[10px] sm:text-xs text-[#6B6396] font-medium hidden sm:block">Pending start</div>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
-              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
+            <div className="bg-white p-3.5 sm:p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
                 <span>In Progress</span>
-                <Clock size={16} className="text-[#6366F1]" />
+                <Clock size={14} className="text-[#6366F1]" />
               </div>
-              <div className="text-3xl font-extrabold text-[#6366F1] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#6366F1] my-1 sm:my-2" style={{ fontFamily: "'Fraunces', serif" }}>
                 {inProgressCount}
               </div>
-              <div className="text-xs text-[#6B6396] font-medium">Active work</div>
+              <div className="text-[10px] sm:text-xs text-[#6B6396] font-medium hidden sm:block">Active work</div>
             </div>
 
-            <div className="bg-white p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
-              <div className="flex items-center justify-between text-[#6B6396] text-xs font-semibold uppercase tracking-wider">
-                <span>Completed</span>
-                <CircleCheck size={16} className="text-[#7C5CFF]" />
+            <div className="bg-white p-3.5 sm:p-5 rounded-3xl border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] flex flex-col justify-between">
+              <div className="flex items-center justify-between text-[#6B6396] text-[10px] sm:text-xs font-semibold uppercase tracking-wider">
+                <span>Done</span>
+                <CircleCheck size={14} className="text-[#7C5CFF]" />
               </div>
-              <div className="text-3xl font-extrabold text-[#7C5CFF] my-2" style={{ fontFamily: "'Fraunces', serif" }}>
+              <div className="text-2xl sm:text-3xl font-extrabold text-[#7C5CFF] my-1 sm:my-2" style={{ fontFamily: "'Fraunces', serif" }}>
                 {completedCount}
               </div>
-              <div className="text-xs text-[#6B6396] font-medium">Finished tasks</div>
+              <div className="text-[10px] sm:text-xs text-[#6B6396] font-medium hidden sm:block">Finished tasks</div>
             </div>
           </div>
         </div>
 
         {/* Quick Add Task Form */}
-        <section className="bg-white rounded-3xl p-6 border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] mb-8">
-          <form onSubmit={handleAddTask} className="flex flex-col md:flex-row gap-3 items-center">
+        <section className="bg-white rounded-3xl p-4 sm:p-6 border border-[#E8E5F7] shadow-[0_8px_25px_rgba(124,92,255,0.05)] mb-8">
+          {addError && (
+            <div className="mb-4 p-3 rounded-2xl bg-[#FFF5F7] border border-[#FF6B6B]/30 text-[#D93838] text-xs font-medium flex items-center gap-2">
+              <AlertCircle size={16} />
+              <span>{addError}</span>
+            </div>
+          )}
+          <form onSubmit={handleAddTask} className="flex flex-col gap-3">
             <input
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder="What needs to be done today?"
-              className="flex-1 w-full bg-[#F8F6FE] border border-[#E8E5F7] focus:border-[#7C5CFF] rounded-2xl px-5 py-3.5 text-[#1E1B4B] placeholder-[#6B6396]/50 outline-none transition-all text-base font-medium"
+              className="w-full bg-[#F8F6FE] border border-[#E8E5F7] focus:border-[#7C5CFF] rounded-2xl px-4 sm:px-5 py-3 sm:py-3.5 text-[#1E1B4B] placeholder-[#6B6396]/50 outline-none transition-all text-sm sm:text-base font-medium"
             />
 
-            <div className="flex items-center gap-2 w-full md:w-auto">
+            <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full">
               <select
                 value={newCategory}
                 onChange={(e) => setNewCategory(e.target.value)}
-                className="bg-[#F8F6FE] border border-[#E8E5F7] text-[#1E1B4B] font-semibold text-xs rounded-2xl px-4 py-3.5 outline-none cursor-pointer"
+                className="flex-1 min-w-[120px] bg-[#F8F6FE] border border-[#E8E5F7] text-[#1E1B4B] font-semibold text-xs rounded-2xl px-3.5 py-3 outline-none cursor-pointer"
               >
                 <option value="Work">Work</option>
                 <option value="Personal">Personal</option>
@@ -323,7 +347,7 @@ export default function Dashboard() {
               <select
                 value={newPriority}
                 onChange={(e) => setNewPriority(e.target.value)}
-                className="bg-[#F8F6FE] border border-[#E8E5F7] text-[#1E1B4B] font-semibold text-xs rounded-2xl px-4 py-3.5 outline-none cursor-pointer"
+                className="flex-1 min-w-[120px] bg-[#F8F6FE] border border-[#E8E5F7] text-[#1E1B4B] font-semibold text-xs rounded-2xl px-3.5 py-3 outline-none cursor-pointer"
               >
                 <option value="low">Low Priority</option>
                 <option value="medium">Medium Priority</option>
@@ -333,10 +357,16 @@ export default function Dashboard() {
               <button
                 type="submit"
                 disabled={!newTitle.trim() || isSubmitting}
-                className="bg-[#7C5CFF] hover:bg-[#6366F1] text-white font-semibold px-6 py-3.5 rounded-2xl shadow-[0_4px_14px_rgba(124,92,255,0.35)] transition-all disabled:opacity-40 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                className="w-full sm:w-auto min-w-[120px] bg-[#7C5CFF] hover:bg-[#6366F1] active:scale-[0.98] text-white font-semibold px-5 py-3 rounded-2xl shadow-[0_4px_14px_rgba(124,92,255,0.35)] transition-all disabled:opacity-40 flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap text-sm"
               >
-                <Plus size={18} />
-                <span>Add Task</span>
+                {isSubmitting ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <Plus size={18} />
+                    <span>Add Task</span>
+                  </>
+                )}
               </button>
             </div>
           </form>
